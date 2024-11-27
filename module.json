@@ -1,7 +1,7 @@
 {
   "id": "dsa5-citymaps",
   "title": "The Dark Eye 5 City Maps",
-  "version": "1.0.0",
+  "version": "#{VERSION}#",
   "compatibility": {
     "minimum": "12",
     "verified": "12"
