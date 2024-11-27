@@ -20,5 +20,16 @@
   ],
   "esmodules": ["scripts/citymaps.mjs"],
   "styles": ["styles/citymaps.css"],
-  "templates": ["templates"]
+  "templates": ["templates"],
+  "url": "#{URL}#",
+  "manifest": "#{MANIFEST}#",
+  "download": "#{DOWNLOAD}#",
+  "license": "LICENSE",
+  "readme": "README.md",
+  "media": [
+    {
+      "type": "icon",
+      "url": "https://avatars2.githubusercontent.com/u/71292812?s=400&u=ccdb4eeb7abf551ca8f314e5a9bfd0479a4d3d41&v=4"
+    }
+  ]
 }
