@@ -36,7 +36,7 @@ To register your city map with the **DSA5 City Maps** module:
 
 To register your city map with the **DSA5 City Maps** module:
 
-1. Create a `cityinfo.mjs` file in your module’s `scripts` folder.
+1. Create a `cityinfo.mjs` file containing the below example code.
 2. Add the following example script to register your city:
 
 ```javascript
