@@ -41,56 +41,81 @@ To register your city map with the **DSA5 City Maps** module:
 
 ```javascript
 export const GrangorAreas = [
-{ name: "Alt-Grangor", tag: "altGrangor", category: "Residential" },
-{ name: "Grangorella", tag: "grangorella", category: "Residential" },
-{ name: "Kopp", tag: "kopp", category: "Residential" },
-{ name: "Koppstein", tag: "koppstein", category: "Residential" },
-{ name: "Neuhaven", tag: "neuhaven", category: "Residential" },
-{ name: "Sicheln", tag: "sicheln", category: "Residential" },
-{ name: "Süd-Grangor", tag: "suedgrangor", category: "Residential" },
-{ name: "Suderstadt", tag: "suderstadt", category: "Residential" },
-{ name: "Traviastrand", tag: "traviastrand", category: "Residential" },
-{ name: "Koppsund", tag: "koppsund", category: "Residential" },
+  { name: "Alt-Grangor", tag: "altGrangor", category: "Residential" },
+  { name: "Grangorella", tag: "grangorella", category: "Residential" },
+  { name: "Kopp", tag: "kopp", category: "Residential" },
+  { name: "Koppstein", tag: "koppstein", category: "Residential" },
+  { name: "Neuhaven", tag: "neuhaven", category: "Residential" },
+  { name: "Sicheln", tag: "sicheln", category: "Residential" },
+  { name: "Süd-Grangor", tag: "suedgrangor", category: "Residential" },
+  { name: "Suderstadt", tag: "suderstadt", category: "Residential" },
+  { name: "Traviastrand", tag: "traviastrand", category: "Residential" },
+  { name: "Koppsund", tag: "koppsund", category: "Residential" },
 ];
 
 export const GrangorSpecialPlaces = [
-{ name: "Rahja Tempel", tag: "rahja", category: "Special Places" },
-{ name: "Tsa Tempel", tag: "tsa", category: "Special Places" },
-{ name: "Drachentempel (Rondra Tempel)", tag: "rondra", category: "Special Places" },
-{ name: "Pilgertempel (Efferd)", tag: "efferd", category: "Special Places" },
+  { name: "Rahja Tempel", tag: "rahja", category: "Special Places" },
+  { name: "Tsa Tempel", tag: "tsa", category: "Special Places" },
+  { name: "Drachentempel (Rondra Tempel)", tag: "rondra", category: "Special Places" },
+  { name: "Pilgertempel (Efferd)", tag: "efferd", category: "Special Places" },
 ];
 
 /**
-* Register this city module with the dsa5-citymaps module
-*/
+ * Register this city module with the dsa5-citymaps module
+ */
 async function registerCityModule() {
-if (!game.user.isGM) return; // Only GMs can register city modules
+  if (!game.user.isGM) return; // Only GMs can register city modules
 
-const moduleId = "dsa5-citymap-grangor"; // This module's ID
-const moduleName = "Grangor"; // This module's name
+  const moduleId = "dsa5-citymap-grangor"; // This module's ID
+  const moduleName = "Grangor"; // This module's name
 
-// City-specific data to register
-const cityData = {
- id: moduleId,
- name: moduleName,
- icon: `modules/${moduleId}/assets/${moduleId}.webp`,
- areas: [...GrangorAreas, ...GrangorSpecialPlaces],
-};
+  // Localize categories in areas
+  const localizedAreas = [...GrangorAreas, ...GrangorSpecialPlaces].map(area => ({
+    ...area,
+    category: game.i18n.localize(`DSA5.CityMap.${area.category}`) || area.category,
+  }));
 
-// Register the city module with the core City Maps module
-let cityModules = game.user.getFlag("dsa5-citymaps", "cityModules") || [];
-if (cityModules.some(city => city.id === moduleId)) {
- console.log(`City module '${moduleName}' is already registered.`);
- return;
+  console.log("Localized Areas:", localizedAreas);
+
+  // City-specific data to register
+  const cityData = {
+    id: moduleId,
+    name: moduleName,
+    icon: `modules/${moduleId}/assets/${moduleId}.webp`,
+    areas: localizedAreas, // Include localized categories in the areas
+  };
+
+  console.log("City Data to Register:", cityData);
+
+  // Get existing city modules
+  let cityModules = game.user.getFlag("dsa5-citymaps", "cityModules") || [];
+  console.log("Existing City Modules (Before Update):", cityModules);
+
+  // Check if already registered
+  const existingModule = cityModules.find(city => city.id === moduleId);
+  if (existingModule) {
+    console.log(`City module '${moduleName}' is already registered.`);
+
+    // Update existing module with areas (if not present)
+    if (!existingModule.areas || existingModule.areas.length === 0) {
+      existingModule.areas = cityData.areas;
+      await game.user.setFlag("dsa5-citymaps", "cityModules", cityModules);
+      console.log(`Updated areas for city module '${moduleName}'.`);
+    }
+    return;
+  }
+
+  // Register the city module
+  cityModules.push(cityData);
+  await game.user.setFlag("dsa5-citymaps", "cityModules", cityModules);
+
+  console.log(`City module '${moduleName}' has been registered successfully.`);
+  console.log("Updated City Modules (After Update):", cityModules);
 }
 
-cityModules.push(cityData);
-await game.user.setFlag("dsa5-citymaps", "cityModules", cityModules);
-console.log(`City module '${moduleName}' has been registered successfully.`);
-}
-
-// Register when Foundry is ready
+// Register the city module when the system is ready
 Hooks.once("ready", async () => {
-await registerCityModule();
+  console.log("Initializing Grangor City Module...");
+  await registerCityModule();
 });
 ```

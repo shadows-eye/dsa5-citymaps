@@ -99,8 +99,12 @@ export class CityMapApplication extends HandlebarsApplicationMixin(ApplicationV2
       return acc;
     }, {});
   
+    console.log("Categorized Areas:", categorizedAreas);
+  
     // Populate with grouped areas
     for (const [category, categoryAreas] of Object.entries(categorizedAreas)) {
+      console.log(`Category: ${category}, Areas:`, categoryAreas);
+  
       // Create a category heading
       const categoryHeading = document.createElement("h3");
       categoryHeading.textContent = category;

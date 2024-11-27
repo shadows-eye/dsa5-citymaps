@@ -7,13 +7,6 @@
     "verified": "12"
   },
   "relationships": {
-    "requires": [
-      {
-        "id": "foundry-vtt-core",
-        "type": "core",
-        "version": ">=12"
-      }
-    ],
     "recommends": [
       {
         "id": "dsa5-core",
