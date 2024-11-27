@@ -1,0 +1,128 @@
+/* Layout for city map content */
+.city-map-window {
+  resize: both; /* Allow resizing */
+  overflow: auto; /* Ensure content adjusts */
+}
+
+.city-map-header {
+  background-color: #f0f0f0; /* Optional header background */
+  padding: 5px 10px;
+  font-size: 1rem;
+  font-weight: bold;
+}
+.city-map-content {
+  width: 600px; /* Fixed width */
+  margin: 0 auto; /* Center align horizontally */
+  padding: 10px; /* Optional padding for spacing */
+
+  border-radius: 5px;
+}
+.city-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 20px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.city-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+}
+
+.city-item img {
+  max-width: 30px;
+  max-height: 50px;
+  object-fit: contain;
+  border: 2px solid transparent;
+}
+
+.city-item img:hover {
+  border-color: #4caf50;
+}
+
+.city-item p {
+  margin-top: 5px;
+  font-size: 0.8rem;
+  color: #333;
+}
+
+/* Styling for details section */
+.city-details {
+  margin-top: 20px;
+}
+
+/* Styling for Areas section */
+.area-sections {
+  max-height: 300px; /* Limit height for scrollability */
+  overflow-y: auto; /* Enable vertical scrolling */
+  margin-top: 20px;
+  padding: 10px;
+
+  border-radius: 5px;
+
+}
+
+.area-buttons {
+  display: grid;
+  grid-template-columns: 1fr 2em 2em 2em; /* Name in first column, buttons in next three */
+  gap: 10px;
+  align-items: center; /* Ensure vertical alignment */
+}
+
+.area-controls {
+  display: contents;
+}
+
+.area-name{
+  font-size: 0.8rem; /* Smaller text size for area name */
+  color: #333;
+  text-align: left;
+  padding-right: 10px;
+  grid-column-start: 1;
+}
+
+/* Flex layout for buttons */
+.area-buttons .button-group {
+  display: flex;
+  gap: 5px;
+  justify-content: flex-start;
+}
+
+.dsa5-citymap-button {
+  padding: 3px 8px;
+  padding: 2px 5px; /* Smaller padding for compact buttons */
+  font-size: 0.7rem; /* Smaller font size */
+  text-align: center;
+  background-color: #f4f4f4;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.dsa5-citymap-button:hover {
+  background-color: #e0e0e0;
+  border-color: #999;
+}
+.dsa5-citymap-button:focus {
+  outline: 2px solid #4caf50;
+}
+.hidden{
+  display: none;
+}
+application .h1,
+h1:first-child {
+  font-size: 3.5rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #782e22;
+}
+application .h2,
+h2:first-child {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #782e22;
+}

@@ -1,0 +1,17 @@
+{
+  "CityMapMenu": "Stadtkarte Menü",
+  "cityMenuDescription": "Wählen Sie eine Stadt, um detaillierte Bereiche und Steuerungen anzuzeigen.",
+  "AllLightsOn": "Alle Lichter einschalten",
+  "AllLightsOff": "Alle Lichter ausschalten",
+  "ToggleDayNight": "Tag/Nacht umschalten",
+  "Areas": "Bereiche",
+  "On": "Ein",
+  "50Percent": "50%",
+  "Off": "Aus",
+  "NoAreasAvailable": "Keine Bereiche verfügbar.",
+  "tooltipViewMap": "Stadtkarte anzeigen",
+  "RegisteredCities": "Registrierte Städte",
+  "UnnamedCity": "Unbenannte Stadt",
+  "GeneralControls": "Allgemeine Steuerungen",
+  "ErrorRegisteringCityModule": "Fehler beim Registrieren des Stadtmoduls:"
+}

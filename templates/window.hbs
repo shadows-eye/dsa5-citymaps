@@ -1,0 +1,47 @@
+<div class="city-map-content">
+  <h1 class="h1 dsa5-citymap">{{localize "CityMapMenu"}}</h1>
+  <div class="dsa5-citymap">{{localize "cityMenuDescription"}}</div>
+
+  <h2>Registered Cities</h2>
+  <div class="city-grid">
+    {{#each cities}}
+      <div class="city-item" data-city-id="{{id}}">
+        <img 
+          src="{{icon}}" 
+          alt="{{name}}" 
+          onerror="this.src='modules/dsa5-citymap-grangor/assets/default-icon.webp'">
+        <p>{{name}}</p>
+      </div>
+    {{else}}
+      <p>No cities registered.</p>
+    {{/each}}
+  </div>
+
+  <!-- General Controls -->
+  <h2 class="dsa5-citymap hidden">General Controls</h2>
+  <div class="form-group hidden">
+    <button class="dsa5-citymap-button" data-action="all-on">{{localize "AllLightsOn"}}</button>
+    <button class="dsa5-citymap-button" data-action="all-off">{{localize "AllLightsOff"}}</button>
+    <button class="dsa5-citymap-button" data-action="toggle-daytime">{{localize "ToggleDayNight"}}</button>
+  </div>
+
+  <!-- Area Sections -->
+  <div class="area-sections hidden">
+    <h2 class="h2 dsa5-citymap">{{localize "Areas"}}</h2>
+    <div class="area-buttons">
+      {{#each areas}}
+        <div class="area-controls">
+          <div class="area-name">{{name}}</div>
+          <div class="button-group">
+            <button class="dsa5-citymap-button" data-action="on">{{localize "On"}}</button>
+            <button class="dsa5-citymap-button" data-action="50">{{localize "50Percent"}}</button>
+            <button class="dsa5-citymap-button" data-action="off">{{localize "Off"}}</button>
+          </div>
+        </div>
+      {{else}}
+        <p>{{localize "NoAreasAvailable"}}</p>
+      {{/each}}
+    </div>
+  </div>
+</div>
+

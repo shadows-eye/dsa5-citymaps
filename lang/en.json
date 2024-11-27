@@ -1,0 +1,17 @@
+{
+  "CityMapMenu": "City Map Menu",
+  "cityMenuDescription": "Select a city to view detailed areas and controls.",
+  "AllLightsOn": "Turn All Lights On",
+  "AllLightsOff": "Turn All Lights Off",
+  "ToggleDayNight": "Toggle Day/Night",
+  "Areas": "Areas",
+  "On": "On",
+  "50Percent": "50%",
+  "Off": "Off",
+  "NoAreasAvailable": "No areas are available.",
+  "tooltipViewMap": "View City Map",
+  "RegisteredCities": "Registered Cities",
+  "UnnamedCity": "Unnamed City",
+  "GeneralControls": "General Controls",
+  "ErrorRegisteringCityModule": "Error registering city module:"
+}
