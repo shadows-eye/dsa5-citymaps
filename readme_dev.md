@@ -16,8 +16,7 @@ This guide explains how developers can create and integrate their own city map m
 dsa5-citymap-grangor/ 
 ├── assets/ 
 │ └── dsa5-citymap-grangor.webp 
-├── scripts/ 
-│ └── cityinfo.mjs 
+├── cityinfo.mjs 
 ├── module.json 
 └── lang/ └── [optional localization files]
 ```
