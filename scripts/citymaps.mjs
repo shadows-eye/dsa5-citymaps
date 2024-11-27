@@ -180,16 +180,41 @@ Hooks.on("getSceneControlButtons", (controls) => {
 });
 
 Hooks.once("ready", async () => {
-  if (game.user.isGM) {
-    console.log("Registering city module for GM...");
-    try {
-      const moduleId = "dsa5-citymap-grangor"; // Example module ID
-      const moduleName = "Grangor"; // Example module name
-      await addCityModule(moduleId, moduleName);
-    } catch (err) {
-      console.error("Error registering city module:", err);
+  if (!game.user.isGM) return; // Only GM should manage this check
+
+  console.log("Checking registered city modules...");
+
+  // Get registered city modules from the flags
+  const registeredCityModules = game.user.getFlag("dsa5-citymaps", "cityModules") || [];
+  console.log("Current registered city modules:", registeredCityModules);
+
+  // Check if each registered module is still active
+  const validModules = [];
+  const missingModules = [];
+
+  for (const module of registeredCityModules) {
+    const foundModule = game.modules.get(module.id);
+
+    if (foundModule && foundModule.active) {
+      console.log(`Module '${module.name}' (${module.id}) is installed and active.`);
+      validModules.push(module);
+    } else {
+      console.warn(`Module '${module.name}' (${module.id}) is missing or inactive.`);
+      missingModules.push(module);
     }
   }
+
+  // Update the flags with only the valid modules
+  /*
+  if (missingModules.length > 0) {
+    console.log("Removing missing modules from the registration...");
+    await game.user.setFlag("dsa5-citymaps", "cityModules", validModules);
+  }
+  */
+  console.log("Validation complete. Registered modules updated.");
+
+  // Notify the user
+  ui.notifications.info("City module validation complete. Check the console for details.");
 });
 
 // Add City Module
