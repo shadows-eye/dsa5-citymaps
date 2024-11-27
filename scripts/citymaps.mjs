@@ -36,13 +36,18 @@ export class CityMapApplication extends HandlebarsApplicationMixin(ApplicationV2
   async _prepareContext(options) {
     // Fetch registered city modules
     const registeredCityModules = game.user.getFlag("dsa5-citymaps", "cityModules") || [];
-    
+
     // Map registered city modules to displayable cities
-    const cities = registeredCityModules.map(module => ({
-      id: module.id || "unknown",
-      name: module.name || "Unnamed City",
-      icon: `modules/${module.id}/assets/${module.id}.webp`,
-    }));
+    const cities = registeredCityModules.map(module => {
+      const defaultIcon = `modules/${module.id}/assets/${module.id}.webp`; // Default icon formula
+      return {
+        id: module.id || "unknown",
+        name: module.name || "Unnamed City",
+        icon: module.icon || defaultIcon, // Use icon from flag or fallback to default formula
+      };
+    });
+
+    console.log("Prepared Cities Data for Template:", cities);
 
     return { cities }; // Provide cities for the template
   }
@@ -189,8 +194,8 @@ Hooks.once("ready", async () => {
   console.log("Current registered city modules:", registeredCityModules);
 
   // Check if each registered module is still active
-  const validModules = [];
-  const missingModules = [];
+  let validModules = [];
+  let missingModules = [];
 
   for (const module of registeredCityModules) {
     const foundModule = game.modules.get(module.id);
