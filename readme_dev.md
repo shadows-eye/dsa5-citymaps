@@ -12,7 +12,13 @@ This guide explains how developers can create and integrate their own city map m
      - A `scripts` folder containing a `cityinfo.mjs` file.
 
 2. **Example Folder Structure**:
-dsa5-citymap-grangor/ ├── assets/ │ └── dsa5-citymap-grangor.webp ├── scripts/ │ └── cityinfo.mjs ├── module.json └── lang/ └── [optional localization files]
+dsa5-citymap-grangor/ 
+├── assets/ 
+│ └── dsa5-citymap-grangor.webp 
+├── scripts/ 
+│ └── cityinfo.mjs 
+├── module.json 
+└── lang/ └── [optional localization files]
 
 
 ---
