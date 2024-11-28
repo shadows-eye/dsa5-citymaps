@@ -154,7 +154,13 @@ Hooks.once("init", async () => {
 
 Hooks.on("getSceneControlButtons", (controls) => {
   console.log("Checking for existing City Map buttons...");
-  
+
+  // Ensure the user is a GM
+  if (!game.user.isGM) {
+    console.log("User is not a GM. Skipping City Map button addition.");
+    return; // Exit if the user is not a GM
+  }
+
   // Find the token control
   const tokenControl = controls.find(c => c.name === 'token');
   if (tokenControl) {
