@@ -10,13 +10,31 @@
   font-size: 1rem;
   font-weight: bold;
 }
+
 .city-map-content {
   width: 600px; /* Fixed width */
   margin: 0 auto; /* Center align horizontally */
   padding: 10px; /* Optional padding for spacing */
-
   border-radius: 5px;
 }
+
+/* Custom Header Styles */
+.city-map-content .h1.dsa5-citymap {
+  font-size: 3.5rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: var(--color-underline-header);
+}
+
+.city-map-content .h2.dsa5-citymap {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  color: var(--color-underline-header);
+}
+
+/* City grid layout */
 .city-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
@@ -61,9 +79,7 @@
   overflow-y: auto; /* Enable vertical scrolling */
   margin-top: 20px;
   padding: 10px;
-
   border-radius: 5px;
-
 }
 
 .area-buttons {
@@ -77,7 +93,7 @@
   display: contents;
 }
 
-.area-name{
+.area-name {
   font-size: 0.8rem; /* Smaller text size for area name */
   color: #333;
   text-align: left;
@@ -93,7 +109,6 @@
 }
 
 .dsa5-citymap-button {
-  padding: 3px 8px;
   padding: 2px 5px; /* Smaller padding for compact buttons */
   font-size: 0.7rem; /* Smaller font size */
   text-align: center;
@@ -107,22 +122,12 @@
   background-color: #e0e0e0;
   border-color: #999;
 }
+
 .dsa5-citymap-button:focus {
   outline: 2px solid #4caf50;
 }
-.hidden{
+
+/* Hidden content */
+.hidden {
   display: none;
-}
-application .h1,
-h1:first-child {
-  font-size: 3.5rem;
-  font-weight: bold;
-  margin-bottom: 10px;
-  color: var(--color-underline-header);
-}
-application .h2,
-h2:first-child {
-  font-size: 2.5rem;
-  font-weight: bold;
-  color: var(--color-underline-header);
 }

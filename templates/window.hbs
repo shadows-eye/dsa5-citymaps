@@ -1,8 +1,8 @@
 <div class="city-map-content">
-  <h1 class="h1 dsa5-citymap">{{localize "CityMapMenu"}}</h1>
+  <div class="h1 dsa5-citymap">{{localize "CityMapMenu"}}</div>
   <div class="dsa5-citymap">{{localize "cityMenuDescription"}}</div>
 
-  <h2>Registered Cities</h2>
+  <div class="dsa5-citymap">Registered Cities</div>
   <div class="city-grid">
     {{#each cities}}
       <div class="city-item" data-city-id="{{id}}">
@@ -18,7 +18,7 @@
   </div>
 
   <!-- General Controls -->
-  <h2 class="dsa5-citymap hidden">General Controls</h2>
+  <div class="dsa5-citymap hidden">General Controls</div>
   <div class="form-group hidden">
     <button class="dsa5-citymap-button" data-action="all-on">{{localize "AllLightsOn"}}</button>
     <button class="dsa5-citymap-button" data-action="all-off">{{localize "AllLightsOff"}}</button>
@@ -27,7 +27,7 @@
 
   <!-- Area Sections -->
   <div class="area-sections hidden">
-    <h2 class="h2 dsa5-citymap">{{localize "Areas"}}</h2>
+    <div class="h2 dsa5-citymap">{{localize "Areas"}}</div>
     <div class="area-buttons">
       {{#each areas}}
         <div class="area-controls">
