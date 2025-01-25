@@ -42,5 +42,5 @@ The **DSA5 City Maps** module provides a button within Foundry VTT's scene contr
 
 ## Requirements
 
-- Foundry VTT version 11 or later.
+- Foundry VTT version 12 or later.
 - The **Tagger** module (needed for the functions).
