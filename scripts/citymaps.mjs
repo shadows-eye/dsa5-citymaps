@@ -8,7 +8,7 @@ export class CityMapApplication extends HandlebarsApplicationMixin(ApplicationV2
     id: "city-map",
     window: { 
       // Localized title
-      title: game.i18n.localize("CityMapMenu")
+      title: "City Maps"
     },
     tag: "div",
     position: { width: 640, height: 640, left: 130, top: 180 },
