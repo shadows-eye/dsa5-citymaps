@@ -6,7 +6,10 @@ registerBasicHelpers(); // Register Handlebars helpers
 export class CityMapApplication extends HandlebarsApplicationMixin(ApplicationV2) {
   static DEFAULT_OPTIONS = {
     id: "city-map",
-    window: { title: "City Menue" },
+    window: { 
+      // Localized title
+      title: game.i18n.localize("CityMapMenu")
+    },
     tag: "div",
     position: { width: 640, height: 640, left: 130, top: 180 },
     resizable: true,
