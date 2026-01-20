@@ -1,13 +1,13 @@
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
-import { registerBasicHelpers } from "./lib/helpers.mjs"; // Import helper functions
+import { registerBasicHelpers } from "./lib/helpers.mjs";
+import { CityMapsAPI } from "./api.mjs";
 
-registerBasicHelpers(); // Register Handlebars helpers
+registerBasicHelpers();
 
 export class CityMapApplication extends HandlebarsApplicationMixin(ApplicationV2) {
   static DEFAULT_OPTIONS = {
     id: "city-map",
     window: { 
-      // Localized title
       title: "City Maps"
     },
     tag: "div",
@@ -22,6 +22,22 @@ export class CityMapApplication extends HandlebarsApplicationMixin(ApplicationV2
     },
   };
 
+  // --- Singleton & Toggle Logic ---
+  static #instance;
+
+  static get isRendered() {
+    return this.#instance?.rendered || false;
+  }
+
+  static async toggle(forceState = null) {
+    if (!this.#instance) this.#instance = new this();
+    const shouldOpen = forceState !== null ? forceState : !this.isRendered;
+
+    if (shouldOpen) return this.#instance.render({ force: true });
+    else return this.#instance.close();
+  }
+
+  // --- Actions ---
   static actions = {
     allOn: () => setAll(false),
     allOff: () => setAll(true),
@@ -29,103 +45,66 @@ export class CityMapApplication extends HandlebarsApplicationMixin(ApplicationV2
     selectCity: function (event) {
       const cityId = event.currentTarget.dataset.cityId;
       console.log(`Selected city: ${cityId}`);
-      this._loadCityAreas(cityId);
+      this._revealAreas(cityId);
     },
   };
 
-  /**
-   * Prepare data for the application template
-   */
   async _prepareContext(options) {
-    // Fetch registered city modules
-    const registeredCityModules = game.user.getFlag("dsa5-citymaps", "cityModules") || [];
+    // Retrieve data from our new API
+    const registeredCities = game.dsa5CityMaps.getAll();
 
-    // Map registered city modules to displayable cities
-    const cities = registeredCityModules.map(module => {
-      const defaultIcon = `modules/${module.id}/assets/${module.id}.webp`; // Default icon formula
+    const cities = registeredCities.map(city => {
+      const defaultIcon = `modules/${city.id}/assets/${city.id}.webp`;
       return {
-        id: module.id || "unknown",
-        name: module.name || "Unnamed City",
-        icon: module.icon || defaultIcon, // Use icon from flag or fallback to default formula
+        id: city.id,
+        name: city.name,
+        icon: city.icon || defaultIcon,
       };
     });
 
-    console.log("Prepared Cities Data for Template:", cities);
-
-    return { cities }; // Provide cities for the template
+    console.log("Prepared Cities Data:", cities);
+    return { cities };
   }
 
-  /**
-   * Post-render actions, such as adding event listeners
-   */
   _onRender(context, options) {
     const html = this.element;
-
-    // Add click listener to city items
     html.querySelectorAll(".city-item").forEach(city => {
       city.addEventListener("click", async (event) => {
         const cityId = event.currentTarget.dataset.cityId;
-        console.log(`Clicked city: ${cityId}`);
         await this._revealAreas(cityId);
       });
     });
   }
 
-  /**
-   * Load and display areas for a specific city
-   * @param {string} cityId
-   */
   async _revealAreas(cityId) {
-    // Get registered city modules
-    const registeredCityModules = game.user.getFlag("dsa5-citymaps", "cityModules") || [];
-    console.log("Registered City Modules:", registeredCityModules);
-  
-    // Find the selected city module by ID
-    const cityModule = registeredCityModules.find(city => city.id === cityId);
-    console.log("Selected City Module:", cityModule);
-  
+    const cityModule = game.dsa5CityMaps.get(cityId);
     if (!cityModule) {
-      console.warn(`City module '${cityId}' not found.`);
       ui.notifications.warn(`City '${cityId}' is not registered.`);
       return;
     }
   
-    // Retrieve areas from the city module
     const areas = cityModule.areas || [];
-    console.log("Areas for City:", areas);
-  
     const areaContainer = this.element.querySelector(".area-buttons");
-  
-    // Clear previous content
     areaContainer.innerHTML = "";
   
-    // Group areas by category
     const categorizedAreas = areas.reduce((acc, area) => {
-      const category = area.category || "Areas"; // Default to "Areas" if no category
+      const category = area.category || "Areas";
       if (!acc[category]) acc[category] = [];
       acc[category].push(area);
       return acc;
     }, {});
   
-    console.log("Categorized Areas:", categorizedAreas);
-  
-    // Populate with grouped areas
     for (const [category, categoryAreas] of Object.entries(categorizedAreas)) {
-      console.log(`Category: ${category}, Areas:`, categoryAreas);
-  
-      // Create a category heading
       const categoryHeading = document.createElement("h3");
       categoryHeading.textContent = category;
       categoryHeading.className = "area-category";
       areaContainer.appendChild(categoryHeading);
   
-      // Add areas within the category
       categoryAreas.forEach(area => {
         const row = document.createElement("div");
         row.className = "area-controls";
         row.dataset.tag = area.tag;
   
-        // Append name and buttons directly into the grid
         row.innerHTML = `
           <div class="area-name">${area.name}</div>
           <button class="dsa5-citymap-button" data-action="on">On</button>
@@ -133,7 +112,6 @@ export class CityMapApplication extends HandlebarsApplicationMixin(ApplicationV2
           <button class="dsa5-citymap-button" data-action="off">Off</button>
         `;
   
-        // Attach event listeners for buttons
         row.querySelector("[data-action='on']").addEventListener("click", () => setByTag(row.dataset.tag, false));
         row.querySelector("[data-action='50']").addEventListener("click", () => setByChance(row.dataset.tag, 0.5));
         row.querySelector("[data-action='off']").addEventListener("click", () => setByTag(row.dataset.tag, true));
@@ -142,117 +120,110 @@ export class CityMapApplication extends HandlebarsApplicationMixin(ApplicationV2
       });
     }
   
-    // Reveal the area section
     const areaSection = this.element.querySelector(".area-sections");
-    areaSection.classList.remove("hidden");
+    if(areaSection) areaSection.classList.remove("hidden");
   }
 
+  // --- Hook into Close to Unpress Button ---
+  async close(options) {
+    const result = await super.close(options);
+    
+    // FIX: Robustly find the tool button even in V13 (Object vs Array)
+    let controlList = ui.controls.controls;
+    
+    // 1. Normalize controls list to Array
+    if (!Array.isArray(controlList)) {
+       controlList = Object.values(controlList);
+    }
+    
+    // 2. Find token layer ("token" or "tokens")
+    const tokenControl = controlList.find(c => c.name === "token" || c.name === "tokens");
+      
+    if (tokenControl) {
+      // 3. Find our specific tool (Array vs Object)
+      let tool = null;
+      if (Array.isArray(tokenControl.tools)) {
+        tool = tokenControl.tools.find(t => t.name === "City-Maps");
+      } else {
+        tool = tokenControl.tools["City-Maps"]; // V13 Dictionary access
+      }
+
+      // 4. Deactivate it
+      if (tool) {
+        tool.active = false;
+        ui.controls.render();
+      }
+    }
+    
+    return result;
+  }
 }
 
-// Hooks
+// --- HOOKS ---
+
 Hooks.once("init", async () => {
-  await loadTemplates(["modules/dsa5-citymaps/templates/window.hbs"]); // Adjusted for new module path
-  console.log("Templates loaded!");
+  game.dsa5CityMaps = new CityMapsAPI();
+  await loadTemplates(["modules/dsa5-citymaps/templates/window.hbs"]);
+  console.log("City Maps | Templates loaded & API initialized");
 });
 
 Hooks.on("getSceneControlButtons", (controls) => {
-  console.log("Checking for existing City Map buttons...");
+  if (!game.user.isGM) return;
 
-  // Ensure the user is a GM
-  if (!game.user.isGM) {
-    console.log("User is not a GM. Skipping City Map button addition.");
-    return; // Exit if the user is not a GM
+  // --- Normalize 'controls' to Array ---
+  let controlList = null;
+  if (Array.isArray(controls)) {
+    controlList = controls; 
+  } else if (typeof controls === "object" && controls !== null) {
+    controlList = Object.values(controls); 
   }
 
-  // Find the token control
-  const tokenControl = controls.find(c => c.name === 'token');
-  if (tokenControl) {
-    // Check if a City Map button already exists
-    const existingButton = tokenControl.tools.some(tool => tool.name === "City-Maps");
-    if (existingButton) {
-      console.log("City Map button already exists. Skipping addition.");
-      return; // Exit if the button is already present
+  // Fallback to global
+  if (!controlList && ui.controls?.controls) {
+    controlList = Array.isArray(ui.controls.controls) 
+      ? ui.controls.controls 
+      : Object.values(ui.controls.controls);
+  }
+
+  if (!controlList) return;
+
+  // --- Find Token Layer ---
+  const tokenControl = controlList.find(c => c.name === "token" || c.name === "tokens");
+  if (!tokenControl) return;
+
+  // --- Define Tool ---
+  const toolConfig = {
+    name: "City-Maps",
+    title: game.i18n.localize("tooltipViewMap"),
+    icon: "fas fa-map",
+    toggle: true,
+    active: CityMapApplication.isRendered,
+    // FIX: Use onChange instead of onClick for V13
+    onChange: (toggled) => {
+      // Ensure we pass a boolean or undefined, not an Event object
+      const state = typeof toggled === "boolean" ? toggled : undefined;
+      CityMapApplication.toggle(state);
     }
+  };
 
-    // Add the City Map button
-    tokenControl.tools.push({
-      name: "City-Maps",
-      title: game.i18n.localize("tooltipViewMap"),
-      icon: "fas fa-map",
-      onClick: () => {
-        const cityMapApp = new CityMapApplication();
-        cityMapApp.render(true);
-        console.log("City Map Application opened.");
-      },
-      button: true,
-    });
-
-    console.log("City Map button added successfully.");
-  } else {
-    console.warn("Could not find 'token' controls to add City Map button.");
-  }
+  // --- Add Tool (Handle Array vs Object) ---
+  if (Array.isArray(tokenControl.tools)) {
+    if (tokenControl.tools.some(tool => tool.name === "City-Maps")) return;
+    tokenControl.tools.push(toolConfig);
+  } 
+  else if (typeof tokenControl.tools === "object" && tokenControl.tools !== null) {
+    if (tokenControl.tools["City-Maps"]) return;
+    tokenControl.tools["City-Maps"] = toolConfig;
+  } 
 });
 
-Hooks.once("ready", async () => {
-  if (!game.user.isGM) return; // Only GM should manage this check
+// --- CORE FUNCTIONS ---
 
-  console.log("Checking registered city modules...");
-
-  // Get registered city modules from the flags
-  const registeredCityModules = game.user.getFlag("dsa5-citymaps", "cityModules") || [];
-  console.log("Current registered city modules:", registeredCityModules);
-
-  // Check if each registered module is still active
-  let validModules = [];
-  let missingModules = [];
-
-  for (const module of registeredCityModules) {
-    const foundModule = game.modules.get(module.id);
-
-    if (foundModule && foundModule.active) {
-      console.log(`Module '${module.name}' (${module.id}) is installed and active.`);
-      validModules.push(module);
-    } else {
-      console.warn(`Module '${module.name}' (${module.id}) is missing or inactive.`);
-      missingModules.push(module);
-    }
-  }
-
-  // Update the flags with only the valid modules
-  /*
-  if (missingModules.length > 0) {
-    console.log("Removing missing modules from the registration...");
-    await game.user.setFlag("dsa5-citymaps", "cityModules", validModules);
-  }
-  */
-  console.log("Validation complete. Registered modules updated.");
-
-  // Notify the user
-  ui.notifications.info("City module validation complete. Check the console for details.");
-});
-
-// Add City Module
-async function addCityModule(moduleId, moduleName) {
-  try {
-    if (!game.user.isGM) return;
-
-    let cityModules = game.user.getFlag("dsa5-citymaps", "cityModules") || [];
-    if (cityModules.some(city => city.id === moduleId)) {
-      console.log(`City module '${moduleName}' is already registered.`);
-      return;
-    }
-
-    cityModules.push({ id: moduleId, name: moduleName });
-    await game.user.setFlag("dsa5-citymaps", "cityModules", cityModules);
-
-    console.log(`City module '${moduleName}' has been added.`);
-  } catch (err) {
-    console.error("Error adding city module:", err);
-  }
-}
-
-// Core Functions
 function setByTag(tag, isOn) {
+  if (typeof Tagger === "undefined") {
+    console.warn("City Maps | Tagger module is required for this feature.");
+    return;
+  }
   const items = Tagger.getByTag(tag);
   if (items.length > 0) {
     const updates = items.map(i => ({ _id: i.id, hidden: isOn }));
@@ -261,6 +232,7 @@ function setByTag(tag, isOn) {
 }
 
 function setByChance(tag, prob) {
+  if (typeof Tagger === "undefined") return;
   const items = Tagger.getByTag(tag);
   if (items.length > 0) {
     const updates = items.map(i => ({
@@ -276,6 +248,6 @@ function setAll(isOn) {
 }
 
 function toggleDaytime() {
-  const isDay = canvas.scene.data.darkness < 0.5;
+  const isDay = canvas.scene.darkness < 0.5;
   canvas.scene.update({ darkness: isDay ? 1 : 0 }, { animateDarkness: true });
 }
